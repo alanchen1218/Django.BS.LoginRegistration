@@ -5,6 +5,7 @@ import bcrypt
 import re
 
 class UserManager(models.Manager):
+    # validates the registration form
     def nameValidator(self, postData):
         errors = {}
         if len(postData['first_name']) < 2:
@@ -26,17 +27,15 @@ class UserManager(models.Manager):
         if postData['password'] != postData['confirm_password']:
             errors['passConfirmPassword'] = "Passwords do not match."
         return errors
-    # This is the registration validator. It runs when the site routes to the
-    # '/register' page to determine if everything follows the validations and
-    # whether to add user and to proceed to welcome page
 
+    # validates the login form
     def loginValidator(self, postData):
         errors = {}
         if len(postData['email']) < 1:
             errors['noEmail'] = "Please input an email."
         elif not re.match('[A-Za-z-0-9-_]+(.[A-Za-z-0-9-_]+)*@[A-Za-z-0-9-_]+(.[A-Za-z-0-9-_]+)*(.[A-Za-z]{2,})', postData['email']):
             errors['emaiValid'] = "Email is not valid."
-        elif not User.objects.get(email=postData['email']):
+        elif not User.objects.filter(email=postData['email']):
             errors['emailExist'] = "This email is not registered in our database."
         if len(postData['password']) < 1:
             errors['noPass'] = "Please input a password."
@@ -45,12 +44,8 @@ class UserManager(models.Manager):
         elif bcrypt.checkpw(postData['password'].encode(), User.objects.get(email=postData['email']).password.encode()) == False:
             errors['incorrect_pass'] = "Incorrect password: does not match password stored in database."
         return errors
-    # This is the login validator. It runs when the site routes to the
-    # '/login' page after the user has submitted their information.
-    # It determines if everything follows the validations and whether
-    # to log in the user and present the welcome page
 
-
+#User table
 class User(models.Model):
     first_name = models.CharField(max_length = 255)
     last_name = models.CharField(max_length = 255)
@@ -59,3 +54,19 @@ class User(models.Model):
     created_at = models.DateTimeField(auto_now_add = True)
     updated_at = models.DateTimeField(auto_now = True)
     objects = UserManager()
+
+#book table
+class Book(models.Model):
+    bookTitle = models.CharField(max_length=45)
+    author = models.CharField(max_length=45)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+#review table linked to the book table and the users table through FK
+class Review(models.Model):
+    review = models.TextField(max_length=1000)
+    rating = models.CharField(max_length=10)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at= models.DateTimeField(auto_now=True)
+    user= models.ForeignKey(User, related_name="userReviews")
+    book= models.ForeignKey(Book, related_name="bookReviews")

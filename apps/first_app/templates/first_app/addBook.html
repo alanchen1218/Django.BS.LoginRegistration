@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add A Book and Review</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'first_app/styles.css' %}">
+</head>
+<body>
+    <h1> this is add book {{request.session.first_name}} {{request.session.last_name}}</h1>
+    <a href="/home">Home</a>
+    <a href="/logout">Logout</a>
+
+    <h3>Add A New Book and Review </h3>
+     <form action = "/addBook" method="post">
+        {% csrf_token %}
+        <p>Book Title: <input type="text" name="bookTitle"></p>
+        <p>Author: <input type="text" name="author"></p>
+        <p>Review:</p>
+        <textarea name="review" rows="3"></textarea>
+        <p>Rating:</p>
+        <select name="rating">
+            <option value="*">*</option>
+            <option value="**">**</option>
+            <option value="***">***</option>
+            <option value="****">****</option>
+            <option value="*****">*****</option>
+        </select>
+        <input type="submit" value ="Add Book and Review">
+     </form>
+
+
+
+</body>
+</html>
