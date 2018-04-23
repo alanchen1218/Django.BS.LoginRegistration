@@ -1,9 +1,10 @@
-from django.shortcuts import render, redirect
-from .models import *
-from django.db.models import Count
-from django.core.urlresolvers import reverse
+from django.shortcuts import render, HttpResponse, redirect
 from django.contrib import messages
-  # the index function is called when root is visited
+from django.db.models import Q
+import bcrypt
+from .models import *
+
+# the index function is called when root is visited
 def index(request):
   return render(request, 'first_app/index.html')
 
@@ -12,16 +13,14 @@ def register(request):
   if len(errors):
     for key, value in errors.items():
       messages.error(request, value)
-      request.session['first_name'] = request.POST['first_name']
-      request.session['last_name'] = request.POST['last_name']
-      request.session['email'] = request.POST['email']
+      request.session['fullname'] = request.POST['fullname']
+      request.session['username'] = request.POST['username']
       return redirect('/')
   else:
     pwhash = bcrypt.hashpw(request.POST['password'].encode(), bcrypt.gensalt())
-    User.objects.create(first_name = request.POST['first_name'], last_name = request.POST['last_name'], email = request.POST['email'], password = pwhash)
-    request.session['first_name'] = request.POST['first_name']
-    request.session['last_name'] = request.POST['last_name']
-    return redirect('/home')
+    User.objects.create(fullname = request.POST['fullname'], username = request.POST['username'], password = pwhash)
+    request.session['fullname'] = request.POST['fullname']
+    return redirect('/dashboard')
 
 def login(request):
   errors = User.objects.loginValidator(request.POST)
@@ -30,84 +29,59 @@ def login(request):
       messages.error(request, value)
     return redirect('/')
   else:
-    request.session['id'] = User.objects.get(email=request.POST['email']).id
-    request.session['first_name'] = User.objects.get(email=request.POST['email']).first_name
-    request.session['last_name'] = User.objects.get(email=request.POST['email']).last_name
-    return redirect('/home')
+    request.session['fullname'] = User.objects.get(username=request.POST['username']).fullname
+    request.session['id'] = User.objects.get(username=request.POST['username']).id
+    print (request.session['id'])
+    return redirect('/dashboard')
   
-def success(request):
-  return render(request, 'first_app/success.html')
 
-def home(request):
-  if not 'first_name' in request.session:
-    return redirect('/')
-  # print(request.session['id'])
-  else:
-    reviews = Review.objects.all()
-    books = Book.objects.all()
-    context = {
-      'reviews' : reviews,
-      'books' : books
-    }
-    return render(request, 'first_app/home.html',context)
+def dashboard(request):
+  currentUser = User.objects.get(id = request.session['id'])
+  context = {
+    'wishlist' : Wishlist.objects.all(),
+    'otherliked' : Wishlist.objects.filter(~Q(liked_users=currentUser)),
+    'liked' : Wishlist.objects.filter(liked_users = currentUser)
+  }
+  liked = {}
+  return render(request, 'first_app/dashboard.html', context)
 
 def logout(request):
     request.session.clear()
     return redirect('/')
 
-def addBook(request):
-  print(Review.user_id)
-  if not 'first_name' in request.session:
-    return redirect('/')
-  else:
-    if request.method == 'POST':
-      if not Book.objects.filter(bookTitle = request.POST['bookTitle'], author = request.POST['author']):
-        Book.objects.create(bookTitle = request.POST['bookTitle'], author = request.POST['author'])
-        book = Book.objects.get(bookTitle = request.POST['bookTitle'], author = request.POST['author'])
-        book.bookReviews.create(review = request.POST['review'], rating = request.POST['rating'], user_id = request.session['id'])
-        return redirect('/home', kwargs={'id' : book.id})
-  books = Book.objects.all()
-  context = {
-    'books': books
-  }
-  return render(request, 'first_app/addBook.html', context)
+def create(request):
+  return render(request, 'first_app/create.html')
 
-def show(request, number):
-  if not 'first_name' in request.session:
-    return redirect('/')
+def createrender(request):
+  errors = Wishlist.objects.WishManager(request.POST)
+  if (errors):
+    for key, value in errors.items():
+      messages.error(request, value)
+    return redirect('/wish_items/create')
   else:
-    book = Book.objects.get(id=number)
-    reviews = book.bookReviews.all()
-    context = {
-      'book' : book,
-      'reviews' : reviews
-    }  
-    return render(request, 'first_app/bookReviews.html', context)
-
-def createReview(request, number):
-  if not 'first_name' in request.session:
-    return redirect('/')
-  else:
-    Review.objects.create(review=request.POST['newReview'], rating=request.POST['rating'],book_id=number,user_id=request.session['id'])
-    return redirect('/home', kwargs={'id':id})
-
-def user(request, number):
-  if not 'first_name' in request.session:
-    return redirect('/')
-  else:
-    user = User.objects.get(id=number)
-    reviews = user.userReviews.all()
-    total = len(reviews)
-    context = {
-      'user' : user,
-      'reviews' : reviews,
-      'total' : total 
-    }
-    return render(request, 'first_app/userReview.html', context)
+    Wishlist.objects.create(name = request.POST['name'],added_by = User.objects.get(id=request.session['id']))
+    return redirect('/dashboard')
 
 def destroy(request, number):
-  if not 'first_name' in request.session:
-    return redirect('/')
-  else:
-    Review.objects.get(id=number).delete()
-    return redirect('/home')
+  Wishlist.objects.get(id=number).delete()
+  return redirect('/dashboard')
+
+def wishItem(request, number):
+  user = User.objects.get(id=number)
+  item = Wishlist.objects.get(id=number)
+  context = {
+    'user' : user,
+    'item' : item
+  }
+  return render(request, 'first_app/info.html', context)
+
+# def add(request, number):
+#    User.objects.get(id=request.session['id']).liked_items.add(Wishlist.objects.get(id=number))
+#    return redirect('/dashboard')
+
+# def show(request, number):
+#   context = {
+#     'item' : Wishlist.objects.get(id=itemid),
+#     'likedusers' : Wishlist.objects.get(id=number).liked_users.all().values('first_name')
+#   }
+#   return render(request, 'first_app/info.html', context)
