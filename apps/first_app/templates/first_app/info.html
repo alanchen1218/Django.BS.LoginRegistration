@@ -2,12 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Successfully in!</title>
+    <title>Item</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'first_app/styles.css' %}">
 </head>
 <body>
-    <h1> Success! Welcome {{request.session.fullname}} {{request.session.username}}</h1>
-    <a href="/" name="goback"> Go back </a>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/logout">Logout</a>
+    <h2>Item: {{item.name}}</h2>
 </body>
 </html>
