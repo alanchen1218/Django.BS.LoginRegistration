@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{% static 'first_app/styles.css' %}">
 </head>
 <body>
-    <h1> Success! Welcome {{request.session.name}} {{request.session.username}}</h1>
+    <h1> Success! Welcome {{request.session.first_name}} {{request.session.last_name}}</h1>
     <a href="/" name="goback"> Go back </a>
 </body>
 </html>
