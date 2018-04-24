@@ -4,7 +4,7 @@ urlpatterns = [
     url(r'^$', views.index),   # This line has changed! Notice that urlpatterns is a list, the comma is in
     url(r'^register$', views.register),
     url(r'^login$', views.login),
-    url(r'^dashboard$', views.dashboard),
+    # url(r'^dashboard$', views.dashboard),
     # url(r'wish_items/create$', views.create),
     # url(r'^createrender$', views.createrender),
 

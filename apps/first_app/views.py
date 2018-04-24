@@ -35,15 +35,15 @@ def login(request):
     return redirect('/dashboard')
   
 
-def dashboard(request):
-  currentUser = User.objects.get(id = request.session['id'])
-  context = {
-    'wishlist' : Wishlist.objects.all(),
-    'otherliked' : Wishlist.objects.filter(~Q(liked_users=currentUser)),
-    'liked' : Wishlist.objects.filter(liked_users = currentUser)
-  }
-  liked = {}
-  return render(request, 'first_app/dashboard.html', context)
+# def dashboard(request):
+#   currentUser = User.objects.get(id = request.session['id'])
+#   context = {
+#     'wishlist' : Wishlist.objects.all(),
+#     'otherliked' : Wishlist.objects.filter(~Q(liked_users=currentUser)),
+#     'liked' : Wishlist.objects.filter(liked_users = currentUser)
+#   }
+#   liked = {}
+#   return render(request, 'first_app/dashboard.html', context)
 
 def logout(request):
     request.session.clear()
