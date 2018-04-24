@@ -49,31 +49,31 @@ def logout(request):
     request.session.clear()
     return redirect('/')
 
-def create(request):
-  return render(request, 'first_app/create.html')
+# def create(request):
+#   return render(request, 'first_app/create.html')
 
-def createrender(request):
-  errors = Wishlist.objects.WishManager(request.POST)
-  if (errors):
-    for key, value in errors.items():
-      messages.error(request, value)
-    return redirect('/wish_items/create')
-  else:
-    Wishlist.objects.create(name = request.POST['name'],added_by = User.objects.get(id=request.session['id']))
-    return redirect('/dashboard')
+# def createrender(request):
+#   errors = Wishlist.objects.WishManager(request.POST)
+#   if (errors):
+#     for key, value in errors.items():
+#       messages.error(request, value)
+#     return redirect('/wish_items/create')
+#   else:
+#     Wishlist.objects.create(name = request.POST['name'],added_by = User.objects.get(id=request.session['id']))
+#     return redirect('/dashboard')
 
-def destroy(request, number):
-  Wishlist.objects.get(id=number).delete()
-  return redirect('/dashboard')
+# def destroy(request, number):
+#   Wishlist.objects.get(id=number).delete()
+#   return redirect('/dashboard')
 
-def wishItem(request, number):
-  user = User.objects.get(id=number)
-  item = Wishlist.objects.get(id=number)
-  context = {
-    'user' : user,
-    'item' : item
-  }
-  return render(request, 'first_app/info.html', context)
+# def wishItem(request, number):
+#   user = User.objects.get(id=number)
+#   item = Wishlist.objects.get(id=number)
+#   context = {
+#     'user' : user,
+#     'item' : item
+#   }
+#   return render(request, 'first_app/info.html', context)
 
 # def add(request, number):
 #    User.objects.get(id=request.session['id']).liked_items.add(Wishlist.objects.get(id=number))

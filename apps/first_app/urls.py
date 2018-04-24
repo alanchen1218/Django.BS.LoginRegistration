@@ -5,12 +5,12 @@ urlpatterns = [
     url(r'^register$', views.register),
     url(r'^login$', views.login),
     url(r'^dashboard$', views.dashboard),
-    url(r'wish_items/create$', views.create),
-    url(r'^createrender$', views.createrender),
+    # url(r'wish_items/create$', views.create),
+    # url(r'^createrender$', views.createrender),
 
-    url(r'^wish_items/(?P<number>\d+)$', views.wishItem), # NOT WORKING
+    # url(r'^wish_items/(?P<number>\d+)$', views.wishItem), # NOT WORKING
 
-    url(r'^destroy/(?P<number>\d+)$', views.destroy),
+    # url(r'^destroy/(?P<number>\d+)$', views.destroy),
     # url(r'^add/(?P<number>\d+)$', views.add), NOT WORKING>>>>>>
 
 ]
