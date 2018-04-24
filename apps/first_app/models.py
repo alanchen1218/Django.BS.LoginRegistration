@@ -26,6 +26,9 @@ class UserManager(models.Manager):
         if postData['password'] != postData['confirm_password']:
             errors['passConfirmPassword'] = "Passwords do not match."
         return errors
+    # This is the registration validator. It runs when the site routes to the
+    # '/register' page to determine if everything follows the validations and
+    # whether to add user and to proceed to welcome page
 
     def loginValidator(self, postData):
         errors = {}
@@ -42,6 +45,11 @@ class UserManager(models.Manager):
         elif bcrypt.checkpw(postData['password'].encode(), User.objects.get(email=postData['email']).password.encode()) == False:
             errors['incorrect_pass'] = "Incorrect password: does not match password stored in database."
         return errors
+    # This is the login validator. It runs when the site routes to the
+    # '/login' page after the user has submitted their information.
+    # It determines if everything follows the validations and whether
+    # to log in the user and present the welcome page
+
 
 class User(models.Model):
     first_name = models.CharField(max_length = 255)
