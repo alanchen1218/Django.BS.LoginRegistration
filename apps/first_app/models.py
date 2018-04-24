@@ -4,6 +4,9 @@ from django.db import models
 import bcrypt
 import re
 
+
+
+
 class UserManager(models.Manager):
     def nameValidator(self, postData):
         errors = {}
